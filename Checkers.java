@@ -1,4 +1,5 @@
-//TODO: 1. Make it so every move is done i.e. leftOrRight is a varible for each piece, 3. make the ai that the computer
+//TODO: 1. ACtually look up good checkers stats 2. Change the points so that moving off of the back is discouraged and making the 
+//...opponent move off the back is encouraged(maybe) 3. make the ai that the computer
 //...plays against look forward 2 moves, 4. fix issue with not being able to play if a no set of fours moves is posible by taking the current total score as that score
 //...when any move fails, 6. Add in a check that will subtract points if a piece is taken off of the back row, this works both
 //...ways as if com2 takes one of their pieces off then it is to the benefit of comMain, 7. Win conditions
@@ -75,8 +76,10 @@ public class Checkers {
 		Random rand = new Random();
 		
 		int firstPiece = 0;
-		int leftOrRight = 0;
-		int isFirstPiece;
+		int leftOrRightFirst = 0;
+		int leftOrRightSecond = 0;
+		int leftOrRightThird = 0;
+		int leftOrRightForth = 0;
 		int secondPiece = 0;
 		int thirdPiece = 0;
 		int forthPiece = 0;
@@ -128,8 +131,7 @@ public class Checkers {
 			firstBoard = copyBoard(displayBoard);
 			firstPlayerPieces = copyPieces(fakePlayerPieces);
 			firstComPieces = copyPieces(fakeComPieces);
-			isFirstPiece = 1;
-			points = moveComputerMainPiece(firstPiece, leftOrRight, isFirstPiece, firstComPieces[firstPiece], firstPlayerPieces, firstBoard);
+			points = moveComputerMainPiece(firstPiece, leftOrRightFirst, firstComPieces[firstPiece], firstPlayerPieces, firstBoard);
 			if(points != -999) {
 				points += calcComputer2Move(firstPlayerPieces, firstComPieces, firstBoard); // += because it returns -highscore
 			}
@@ -137,8 +139,7 @@ public class Checkers {
 				secondBoard = copyBoard(firstBoard);
 				secondPlayerPieces = copyPieces(firstPlayerPieces);
 				secondComPieces = copyPieces(firstComPieces);
-				isFirstPiece = 0;
-				secondPoints = moveComputerMainPiece(secondPiece, leftOrRight, isFirstPiece, secondComPieces[secondPiece], secondPlayerPieces, secondBoard);
+				secondPoints = moveComputerMainPiece(secondPiece, leftOrRightFirst, secondComPieces[secondPiece], secondPlayerPieces, secondBoard);
 				if(secondPoints != -999) {
 					secondPoints += calcComputer2Move(secondPlayerPieces, secondComPieces, secondBoard);
 					points += secondPoints;
@@ -147,7 +148,7 @@ public class Checkers {
 					thirdBoard = copyBoard(secondBoard);
 					thirdPlayerPieces = copyPieces(secondPlayerPieces);
 					thirdComPieces = copyPieces(secondComPieces);
-					thirdPoints = moveComputerMainPiece(thirdPiece, leftOrRight, isFirstPiece, thirdComPieces[thirdPiece], thirdPlayerPieces, thirdBoard);
+					thirdPoints = moveComputerMainPiece(thirdPiece, leftOrRightFirst, thirdComPieces[thirdPiece], thirdPlayerPieces, thirdBoard);
 					if(thirdPoints != -999) {
 						thirdPoints += calcComputer2Move(thirdPlayerPieces, thirdComPieces, thirdBoard);
 						points += thirdPoints;
@@ -156,7 +157,7 @@ public class Checkers {
 						forthBoard = copyBoard(thirdBoard);
 						forthPlayerPieces = copyPieces(thirdPlayerPieces);
 						forthComPieces = copyPieces(thirdComPieces);
-						forthPoints = moveComputerMainPiece(forthPiece, leftOrRight, isFirstPiece, forthComPieces[forthPiece], forthPlayerPieces, forthBoard);
+						forthPoints = moveComputerMainPiece(forthPiece, leftOrRightFirst, forthComPieces[forthPiece], forthPlayerPieces, forthBoard);
 						if(forthPoints != -999) {
 							forthPoints += calcComputer2Move(forthPlayerPieces, forthComPieces, forthBoard);
 							points += forthPoints;
@@ -164,13 +165,13 @@ public class Checkers {
 						if(points > highscore) {
 							highscore = points;
 							pieceToMove = firstPiece;
-							directionToMove = leftOrRight;
+							directionToMove = leftOrRightFirst;
 						}
 						else if(points == highscore) {
 							if(rand.nextInt(10) < 5) {
 								highscore = points;
 								pieceToMove = firstPiece;
-								directionToMove = leftOrRight;
+								directionToMove = leftOrRightFirst;
 							}
 						}
 						if(forthPoints != -999) {
@@ -178,7 +179,11 @@ public class Checkers {
 							forthPlayerPieces = copyPieces(thirdPlayerPieces);
 							forthComPieces[forthPiece] = copyPiece(thirdComPieces, forthPiece);
 						}
-						forthPiece++;
+						leftOrRightForth++;
+						if(leftOrRightForth > 1) {
+							leftOrRightForth = 0;
+							forthPiece++;
+						}
 						if(forthPoints != -999) {
 							points -= forthPoints;
 						}
@@ -190,7 +195,11 @@ public class Checkers {
 						thirdComPieces[thirdPiece] = copyPiece(secondComPieces, thirdPiece);
 					}
 					forthPiece = 0;
-					thirdPiece++;
+					leftOrRightThird++;
+					if(leftOrRightThird > 1) {
+						leftOrRightThird = 0;
+						thirdPiece++;
+					}
 					if(thirdPoints != -999) {
 						points -= thirdPoints;
 					}
@@ -202,7 +211,11 @@ public class Checkers {
 					secondComPieces[secondPiece] = copyPiece(firstComPieces, secondPiece);
 				}
 				thirdPiece = 0;
-				secondPiece++;
+				leftOrRightSecond++;
+				if(leftOrRightSecond > 1) {
+					leftOrRightSecond = 0;
+					secondPiece++;
+				}
 				if(secondPoints != -999) {
 					points -= secondPoints;
 				}
@@ -214,9 +227,9 @@ public class Checkers {
 				firstComPieces[firstPiece] = copyPiece(fakeComPieces, firstPiece);
 			}
 			secondPiece = 0;
-			leftOrRight++;
-			if(leftOrRight > 1) {
-				leftOrRight = 0;
+			leftOrRightFirst++;
+			if(leftOrRightFirst > 1) {
+				leftOrRightFirst = 0;
 				firstPiece++;
 			}
 			points = 0;
@@ -233,22 +246,22 @@ public class Checkers {
 	
 	public static double calcComputer2Move(int [][] fakeCom2Pieces, int [][] fakeComPieces, char[][] displayBoard) {
 		int firstPiece = 0;
-		int leftOrRight = 0;
+		int leftOrRightFirst = 0;
 		double com2Points = 0;
 		double highscore = 0;
 		
 		
 		while(firstPiece < 12) {
-			com2Points = moveCom2Piece(leftOrRight, fakeCom2Pieces[firstPiece], fakeComPieces, displayBoard);
+			com2Points = moveCom2Piece(leftOrRightFirst, fakeCom2Pieces[firstPiece], fakeComPieces, displayBoard);
 			if(com2Points != -999) {
 				if(com2Points > highscore) {
 					highscore = com2Points;
 				}
 			}
 			com2Points = 0;
-			leftOrRight++;
-			if(leftOrRight > 1) {
-				leftOrRight = 0;
+			leftOrRightFirst++;
+			if(leftOrRightFirst > 1) {
+				leftOrRightFirst = 0;
 				firstPiece++;
 			}
 		}
@@ -257,7 +270,7 @@ public class Checkers {
 	
 	//---------------------------------------------------------------------------------------------------------------------------------------------------
 	
-	public static double moveCom2Piece(int leftOrRight, int [] fakeCom2Piece, int [][] fakeComPieces, char [][] displayBoard) {
+	public static double moveCom2Piece(int leftOrRightFirst, int [] fakeCom2Piece, int [][] fakeComPieces, char [][] displayBoard) {
 		Random rand = new Random();
 		
 		String move;
@@ -273,7 +286,7 @@ public class Checkers {
 		}
 		
 		if(fakeCom2Piece[1] == 0) {
-			if(leftOrRight == 0) {
+			if(leftOrRightFirst == 0) {
 				if(canMoveLeftUp) {
 					move = "LeftUp";
 					points += moveComputer2(move, fakeCom2Piece, points, fakeComPieces, displayBoard);
@@ -283,7 +296,7 @@ public class Checkers {
 					return -999;
 				}
 			}
-			else if(leftOrRight == 1) {
+			else if(leftOrRightFirst == 1) {
 				if(canMoveRightUp) {
 					move = "RightUp";
 					points += moveComputer2(move, fakeCom2Piece, points, fakeComPieces, displayBoard);
@@ -316,7 +329,7 @@ public class Checkers {
 				return points;
 			}
 			else {
-				if(leftOrRight == 0) {
+				if(leftOrRightFirst == 0) {
 					if(canMoveLeftDown && canMoveLeftUp) {
 						if(rand.nextInt(10) < 5) { // 50% chance to move left
 							move = "LeftDown";
@@ -343,7 +356,7 @@ public class Checkers {
 						return -999;
 					}
 				}
-				else if(leftOrRight == 1) {
+				else if(leftOrRightFirst == 1) {
 					if(canMoveRightDown && canMoveRightUp) {
 						if(rand.nextInt(10) < 5) { // 50% chance to move left
 							move = "RightDown";
@@ -375,7 +388,7 @@ public class Checkers {
 		return points;
 	}
 
-	public static double moveComputerMainPiece(int piece, int leftOrRight, int isFirstPiece, int [] fakeComPiece, int [][] playerPieces, char [][] displayBoard) {
+	public static double moveComputerMainPiece(int piece, int leftOrRightFirst, int [] fakeComPiece, int [][] playerPieces, char [][] displayBoard) {
 		Random rand = new Random();
 		
 		int randomResult;
@@ -391,197 +404,101 @@ public class Checkers {
 		}
 		
 		if(fakeComPiece[1] == 0) { // if the piece is not kinged
-			if(isFirstPiece == 0) { // if it is not the first piece to move
-				if(canMoveRightDown && canMoveLeftDown) {// if it can move both ways
-					if(rand.nextInt(10) < 5) { // 50% chance to move left
-						move = "LeftDown";
-						points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-						return points;
-					}
-					else {
-						move = "RightDown";
-						points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-						return points;
-					}
-				}
-				else if(canMoveRightDown) {
-					move = "RightDown";
-					points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-					return points;
-				}
-				else if(canMoveLeftDown) {
+			if(leftOrRightFirst == 0) {
+				if(canMoveLeftDown) {
 					move = "LeftDown";
 					points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
 					return points;
 				}
 				else {
-					return -999; // can't move
+					return -999;
 				}
 			}
-			else if(isFirstPiece == 1) { // if it is the first piece
-				if(leftOrRight == 0) {
-					if(canMoveLeftDown) {
-						move = "LeftDown";
-						points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-						return points;
-					}
-					else {
-						return -999;
-					}
+			else if(leftOrRightFirst == 1) {
+				if(canMoveRightDown) {
+					move = "RightDown";
+					points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
+					return points;
 				}
-				else if(leftOrRight == 1) {
-					if(canMoveRightDown) {
-						move = "RightDown";
-						points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-						return points;
-					}
-					else {
-						return -999;
-					}
+				else {
+					return -999;
 				}
 			}
 		}
 		else if(fakeComPiece[1] == 1) { // kinged piece
-			if(isFirstPiece == 0) { // if it is not the first piece to move
-				if(canMoveLeftDown && !(canMoveRightDown) && !(canMoveLeftUp) && !(canMoveRightUp)) {
-					move = "LeftDown";
-					points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-					return points;
-				}
-				else if(canMoveRightDown && !(canMoveLeftDown) && !(canMoveLeftUp) && !(canMoveRightUp)) {
-					move = "RightDown";
-					points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-					return points;
-				}
-				else if(canMoveLeftUp && !(canMoveLeftDown) && !(canMoveRightDown) && !(canMoveRightUp)) {
-					move = "LeftUp";
-					points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-					return points;
-				}
-				else if(canMoveRightUp && !(canMoveLeftDown) && !(canMoveLeftUp) && !(canMoveRightDown)) {
-					move = "RightUp";
-					points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-					return points;
-				}
-				else {// if it can move multiple ways
-					randomResult = rand.nextInt(40);
-					if(randomResult < 10) { // be careful with these less thans because they are inpercise and include all values below like < 20 is a 50% chance
-						if(canMoveLeftDown) {
-							move = "LeftDown";
-							points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-							return points;
-						}
-						else {
-							return -999;
-						}
-					}
-					else if(randomResult < 20) {
-						if(canMoveRightDown) {
-							move = "RightDown";
-							points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-							return points;
-						}
-						else {
-							return -999;
-						}
-					}
-					else if(randomResult < 30) {
-						if(canMoveLeftUp) {
-							move = "LeftUp";
-							points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-							return points;
-						}
-						else {
-							return -999;
-						}
-					}
-					else if(randomResult < 40){
-						if(canMoveRightUp) {
-							move = "RightUp";
-							points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-							return points;
-						}
-						else {
-							return -999;
-						}
-					}
-				}
+			if(canMoveLeftDown && !(canMoveRightDown) && !(canMoveLeftUp) && !(canMoveRightUp)) {
+				move = "LeftDown";
+				points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
+				return points;
 			}
-			else if(isFirstPiece == 1) { // if it is the first piece
-				if(canMoveLeftDown && !(canMoveRightDown) && !(canMoveLeftUp) && !(canMoveRightUp)) {
-					move = "LeftDown";
-					points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-					return points;
-				}
-				else if(canMoveRightDown && !(canMoveLeftDown) && !(canMoveLeftUp) && !(canMoveRightUp)) {
-					move = "RightDown";
-					points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-					return points;
-				}
-				else if(canMoveLeftUp && !(canMoveLeftDown) && !(canMoveRightDown) && !(canMoveRightUp)) {
-					move = "LeftUp";
-					points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-					return points;
-				}
-				else if(canMoveRightUp && !(canMoveLeftDown) && !(canMoveRightDown) && !(canMoveLeftUp)) {
-					move = "RightUp";
-					points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-					return points;
-				}
-				else {
-					if(leftOrRight == 0) {
-						if(canMoveLeftDown && canMoveLeftUp) {
-							if(rand.nextInt(10) < 5) { // 50% chance to move left
-								move = "LeftDown";
-								points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-								return points;
-							}
-							else {
-								move = "LeftUp";
-								points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-								return points;
-							}
-						}
-						else if(canMoveLeftDown){
+			else if(canMoveRightDown && !(canMoveLeftDown) && !(canMoveLeftUp) && !(canMoveRightUp)) {
+				move = "RightDown";
+				points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
+				return points;
+			}
+			else if(canMoveLeftUp && !(canMoveLeftDown) && !(canMoveRightDown) && !(canMoveRightUp)) {
+				move = "LeftUp";
+				points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
+				return points;
+			}
+			else if(canMoveRightUp && !(canMoveLeftDown) && !(canMoveRightDown) && !(canMoveLeftUp)) {
+				move = "RightUp";
+				points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
+				return points;
+			}
+			else {
+				if(leftOrRightFirst == 0) {
+					if(canMoveLeftDown && canMoveLeftUp) {
+						if(rand.nextInt(10) < 5) { // 50% chance to move left
 							move = "LeftDown";
 							points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
 							return points;
 						}
-						else if(canMoveLeftUp){
+						else {
 							move = "LeftUp";
 							points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
 							return points;
 						}
-						else {
-							return -999;
-						}
 					}
-					else if(leftOrRight == 1) {
-						if(canMoveRightDown && canMoveRightUp) {
-							if(rand.nextInt(10) < 5) { // 50% chance to move left
-								move = "RightDown";
-								points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-								return points;
-							}
-							else {
-								move = "RightUp";
-								points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
-								return points;
-							}
-						}
-						else if(canMoveRightDown){
+					else if(canMoveLeftDown){
+						move = "LeftDown";
+						points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
+						return points;
+					}
+					else if(canMoveLeftUp){
+						move = "LeftUp";
+						points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
+						return points;
+					}
+					else {
+						return -999;
+					}
+				}
+				else if(leftOrRightFirst == 1) {
+					if(canMoveRightDown && canMoveRightUp) {
+						if(rand.nextInt(10) < 5) { // 50% chance to move left
 							move = "RightDown";
 							points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
 							return points;
 						}
-						else if(canMoveRightUp){
+						else {
 							move = "RightUp";
 							points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
 							return points;
 						}
-						else {
-							return -999;
-						}
+					}
+					else if(canMoveRightDown){
+						move = "RightDown";
+						points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
+						return points;
+					}
+					else if(canMoveRightUp){
+						move = "RightUp";
+						points += moveComputer(move, fakeComPiece, playerPieces, displayBoard);
+						return points;
+					}
+					else {
+						return -999;
 					}
 				}
 			}
@@ -661,7 +578,7 @@ public class Checkers {
 								return returnedMove;
 							}
 							else {
-								System.out.println("\tCannot move that piece left. Please select another move: ");
+								System.out.print("\tCannot move that piece left. Please select another move: ");
 								move = s.nextLine().toLowerCase();
 								continue;
 							}
@@ -673,13 +590,13 @@ public class Checkers {
 								return returnedMove;
 							}
 							else {
-								System.out.println("\tCannot move that piece right. Please select another move: ");
+								System.out.print("\tCannot move that piece right. Please select another move: ");
 								move = s.nextLine().toLowerCase();
 								continue;
 							}
 						}
 						else {
-							System.out.println("Invalid move. Please enter \"right\" or \"left\" or press \"q\" to select a different piece:  ");
+							System.out.print("Invalid move. Please enter \"right\" or \"left\" or press \"q\" to select a different piece:  ");
 							move = s.nextLine().toLowerCase();
 							continue;
 						}
@@ -731,7 +648,7 @@ public class Checkers {
 							return returnedMove;
 						}
 						else {
-							System.out.println("\tCannot move that piece left. Please select another move: ");
+							System.out.print("\tCannot move that piece left. Please select another move: ");
 							move = s.nextLine().toLowerCase();
 							continue;
 						}
@@ -769,10 +686,15 @@ public class Checkers {
 							return returnedMove;
 						}
 						else {
-							System.out.println("\tCannot move that piece Right. Please select another move: ");
+							System.out.print("\tCannot move that piece Right. Please select another move: ");
 							move = s.nextLine().toLowerCase();
 							continue;
 						}
+					}
+					else {
+						System.out.print("Invalid move. Please enter a valid move");
+						move = s.nextLine().toLowerCase();
+						continue;
 					}
 				}
 			}
