@@ -1,2 +1,3 @@
 # Checkers-Brute-Force
-My attempt at a checkers AI that can beat me at checkers
+My in progress attempt at a checkers bot that can beat me at checkers
+
